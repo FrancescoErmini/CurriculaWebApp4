@@ -1,0 +1,26 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Creazione corsi con parser csv </h4>
+
+	<form action = "{{ url_for('createCoursesFromCsvParser') }}" method="post"  class="form-row">
+
+
+		 <label class="form-group col-md-2">academicyear: </label>
+
+	 	<select name="academicyear" class="custom-select col-sm-10" style="margin-bottom: 20px">
+          {% for ac in academicyears %}
+          <option value="{{ ac.id }}">{{ ac.id }}</option>
+          {% endfor %}
+        </select>
+		 
+		 <input type="submit" name="submit" value="esegui il parser corsi.csv" class="btn btn-block btn-outline-warning">
+	</form>
+	<form action="{{ url_for('indexCourse') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+<i>** la funzione legge il file csv - csv/corsi.csv - e crea automaticamente i corsi da inserire nel database. </i>
+{% endblock %}

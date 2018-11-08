@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h2> {% block title %} Curricula  {% endblock %}</h2>
+{% endblock %}
+{% block content %}
+	<!--<h2> Curricula per Ingegneria Informatica Magistrale  - Unifi </h2>-->
+	<div class="table-responsive">
+	<table class="table table-bordered">
+		{% for curriculum in curricula %}
+		<tr>
+	        <td class="smallcell">{{ curriculum.title }}</td>
+	        <td class="picocell">{{curriculum.ac}}</td>
+	        <td class="bigcell">{{ curriculum.desc}}</td>
+	        <td> <a href='/curriculum/{{curriculum.id}}'> <input type="button" value="Scegli" class="btn btn-outline-primary"></a> </td>
+	    </tr>
+	    {% endfor %}
+
+	</table> 
+	</div>
+
+{% endblock %}

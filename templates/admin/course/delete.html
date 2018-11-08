@@ -1,0 +1,15 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4>Cancellazione corso</h4>
+<p> are you sure to delete the course {{course.name}} | {{course.id}} ?</p>
+
+<form action = "{{ url_for('deleteCourse' , course_id = course.id) }}" method="post" class="form-row">
+	<input type="submit" name="delete" value="undo"  class="btn btn-block btn-outline-secondary">
+	<input type="submit" name="delete" value="delete" class="btn btn-block btn-outline-danger" >
+</form>
+
+{% endblock %}

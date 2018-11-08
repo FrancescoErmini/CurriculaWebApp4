@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h2> {% block title %} Error {% endblock %}</h2>
+{% endblock %}
+{% block content %}
+
+	<h4> La pagina che cerchi non esiste. </h4>
+	<p> <a href="{{url_for('curricula')}}"> Torna alla pagina principale </a> </p>
+{% endblock %}

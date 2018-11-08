@@ -1,0 +1,61 @@
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+
+.error {
+  color: red;
+}
+
+h2 {
+  padding: 40px 0 40px 0;
+  text-align: center;
+}
+h4 {
+  padding: 10px 0 10px 0;
+}
+
+p {
+  -bottom: 10px;
+}
+
+form {
+ /* background-color:   #f2f2f2;*/
+  padding:3%;
+}
+legend {
+
+}
+
+.nav-link.active {
+  color:  #007bff !important; 
+}
+.nav-tabs {
+  background-color: #F8F8F8 !important;
+}
+
+.nav-tabs > a:hover{
+  color:  #007bff  !important;
+  background-color: #FFFFFF !important;
+}
+.border{
+  border: 1px solid #e0e0e0;
+}
+
+
+.picocell {
+  min-width: 5%;
+  text-align: center;
+}
+.smallcell{
+  min-width: 20%;
+  text-align: center;
+
+}
+.bigcell {
+  min-width: 58%;
+  text-align: left;
+  padding-left: 5%;
+}

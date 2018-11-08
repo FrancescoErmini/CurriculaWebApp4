@@ -1,0 +1,45 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Creazione corso </h4>
+
+	<form action = "{{ url_for('createCourse') }}" method="post"  class="form-row">
+		 <label class="form-group col-md-2"> codice: </label>
+		 <input type="text" name="id" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">name:  </label>
+		 <input type="text" name="name" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">cfu: </label>
+		 <input type="number" name="cfu" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">ssd: </label>
+		 <input type="text" name="ssd" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">year: </label>
+		 <input type="number" name="year" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">semester: </label>
+		 <input type="number" name="semester" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2"> url: </label>
+		 <input type="text" name="url" class="form-group col-md-10">
+
+		 <label class="form-group col-md-2">academicyear: </label>
+
+	 	<select name="academicyear" class="custom-select col-sm-10" style="margin-bottom: 20px">
+          {% for ac in academicyears %}
+          <option value="{{ ac.id }}">{{ ac.id }}</option>
+          {% endfor %}
+        </select>
+		 
+		 <input type="submit" name="submit" value="salva" class="btn btn-block btn-outline-success">
+	</form>
+	<form action="{{ url_for('indexCourse') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+h4 {
+  text-align: center;
+  padding: 15px;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+table {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+form {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+a {
+	text-decoration: none;
+}
+
+ul {
+
+	list-style-type: none;
+}

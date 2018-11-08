@@ -1,0 +1,23 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Creazione anno accademico </h4>
+
+	<form action = "{{ url_for('createAcademicyear') }}" method="post" class="form-row">
+
+		 <label class="form-group col-md-2"> Anno accademico: </label>
+		 <input type="text" name="id" class="form-group col-md-10" placeholder="2018-2019">
+		 <p><i> ** L'anno accademico va scritto secodo la sintassi yyyy-yyyy </i> </p>
+
+
+		 <input type="submit" name="submit" value="salva" class="btn btn-block btn-outline-success"></p>
+	</form>
+	<form action="{{ url_for('indexAcademicyear') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h2> {% block title %} Piano di studio in ingegneria informatica magistrale - Unifi {% endblock %}</h2>
+{% endblock %}
+{% block content %}
+<h4> Curriculum: {{studyplan.curriculum.title}} per a.a {{studyplan.curriculum.ac}} </h4>
+
+
+<p> Matricola: {{student.id}}</p>
+<p> Nome: {{student.firstname}}</p>
+<p> Cognome: {{student.lastname}}</p>
+
+<table class="table table-bordered">
+
+	<th> codice ins </th>
+	<th> nome </th>
+    <th> cfu </th>
+    <th> ssd </th>
+
+	{% for course in studyplan.courses %}
+	<tr>
+		<td>{{ course.id }}</td>
+        <td>{{ course.name}}</td>
+        <td> {{course.cfu}}</td>
+        <td> {{course.ssd}}</td>
+        
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="4" style="text-align: center;"> <i> Corsi a scelta libera </i></td>
+    </tr>
+    {% for othercourse in studyplan.othercourses %}
+    <tr>
+    	<td>{{othercourse.id}}</td>
+    	<td>{{othercourse.name}}</td>
+        <td> {{othercourse.cfu}}</td>
+        <td>{{othercourse.ssd}}</td>
+    </tr>
+    {% endfor %}
+   
+</table> 
+
+<p> Nota studente: {{studyplan.note}} </p>
+
+	
+{% endblock %}

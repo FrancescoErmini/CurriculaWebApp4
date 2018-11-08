@@ -1,0 +1,55 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Creazione curriculum </h4>
+
+	<form action = "{{ url_for('createCurriculum') }}" method="post" class="form-row">
+
+		<label class="form-group col-md-2"> Nome curriculum: </label>
+		<input type="text" name="title" class="form-group col-md-10" >
+
+		<label class="form-group col-md-2"> Descrizione: </label>
+		<input type="text" name="desc" class="form-group col-md-10" >
+
+
+		<label class="form-group col-md-2"> Anno accademico: </label>
+	 	<select name="academicyear" class="custom-select col-sm-10">
+          {% for ac in academicyears %}
+          <option value="{{ ac.id }}">{{ ac.id }}</option>
+          {% endfor %}
+        </select>
+
+        <label class="form-group col-md-2"> Gruppi: </label>
+		<table class="table table-bordered">
+			<tr>
+				<th></th>
+				<th>nome gruppo</th>
+				<th>numero di esami</th>
+			</tr>
+		  {% for g in groups %}
+		    <tr>
+		    <td>
+		      <input type='checkbox' name='group_id[]' value='{{ g.id }}'> 
+		    </td>
+		    <td>
+				{{ g.name }}
+		    </td>
+		    <td>
+		    	{{g.n}}
+		    </td>
+		    </tr>
+		  {% endfor %}
+		</table>
+
+
+		<input type="submit" name="submit" value="salva" class="btn btn-block btn-outline-success">
+
+	</form>
+	<form action="{{ url_for('indexCurriculum') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+
+{% endblock %}

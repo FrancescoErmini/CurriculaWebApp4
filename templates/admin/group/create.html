@@ -1,0 +1,52 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Creazione gruppo </h4>
+
+	<form action = "{{ url_for('createGroup') }}" method="post" class="form-row">
+		<label class="form-group col-md-2"> Nome gruppo: </label>
+		<input type="text" name="name" class="form-group col-md-10" >
+
+		<label class="form-group col-md-2"> Numero di esami: </label>
+		<input type="text" name="n" class="form-group col-md-10">
+		<!--
+		<label class="form-group col-md-2"> Cfu per esame </label>
+		<input type="text" name="cfu" class="form-group col-md-10"> -->
+
+		<label class="form-group col-md-2"> Corsi: </label>
+
+		<table class="table table-bordered">
+			<tr>
+				<th></th>
+				<th> codice </th>
+				<th> nome </th>
+				<th> cfu </th>
+			</tr>
+		  {% for course in courses %}
+		   <tr>
+		    <td>
+		      <input type='checkbox' name='course_id[]' value='{{ course.id }}'> 
+		    </td>
+		    <td>
+		    	{{ course.id }}
+		    </td>
+		    <td>
+		    	{{ course.name }}
+		    </td>
+		    <td>
+		    	{{course.cfu}}
+		    </td>
+		   </tr>
+		  {% endfor %}
+		</table>
+   	
+        <input type="submit"  name="submit" value="salva" class="btn btn-block btn-outline-success">
+
+	</form>
+	<form action="{{ url_for('indexGroup') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+{% endblock %}

@@ -1,0 +1,19 @@
+
+{% extends 'admin/template.html' %}
+
+{% block header %}
+
+{% endblock %}
+{% block content %}
+
+<h4> Cancellazione anno accademico </h4>
+
+	<p> are you sure to delete the academic year  {{academicyear.id}} ?</p>
+
+	<form action = "{{ url_for('deleteAcademicyear' , academicyear_id = academicyear.id) }}" method="post" class="form-row">
+		<input type="submit" name="delete" value="undo" class="btn btn-block btn-outline-secondary">
+		<input type="submit" name="delete" value="delete" class="btn btn-block btn-outline-danger">
+	</form>
+
+
+{% endblock %}

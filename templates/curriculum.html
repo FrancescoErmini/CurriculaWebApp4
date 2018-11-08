@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1> {{curriculum.title}} </h1>
+{% endblock %}
+
+{% block content %}
+{% if valid_curriculum %}
+<form action = "/curriculum/{{curriculum.id}}" method="post">
+	{% for group in groups %}
+	<ul class="list-group">
+	  <li class="list-group-item list-group-flush">
+	   <h4>Scegli {{group.n}} esami dalla tabella {{group.name}}:</h4>
+	   <div class="table-responsive">
+	       <table  class="table table-bordered">
+	        <tr>
+	          <th> </th>
+	          <th>codice</th>
+	          <th>nome</th>
+	          <th>cfu</th>
+	          <th>anno</th>
+	          <th>periodo</th>
+	          <th>ssd</th>
+	        </tr>
+	        {% for course in group.courses %}
+	       <tr>
+			<td><input type='checkbox' name='course_id[]' value='{{ course.id }}'> </td>
+			<td class="smallcell"> {{ course.id }} </td>
+	        <td class="bigcell">  <a href="{{course.url}}"> {{course.name}}  </a> </td>
+	        <td class="picocell"> {{course.cfu}} </td>
+	        <td class="picocell"> {{course.year}} </td>
+	        <td class="picocell">  {{course.semester}} </td>
+	        <td class="smallcell"> {{course.ssd}} </td>
+	        </tr>
+	        {% endfor %}
+	      </table>
+	      </div>
+	  </li>
+
+	{% endfor %}
+
+		<li class="list-group-item list-group-flush">
+	    	<h4>Scegli 2 esami per un totale di 12 cfu dalla tabella corsi a scelta libera:</h4>
+			<nav class="nav nav-tabs nav-justified" style="backgroud:red">
+			         <a class="nav-item nav-link active" data-toggle="tab" data-target="#Tab1"> Scegli da elenco </a>
+			         <a class="nav-item nav-link" data-toggle="tab" data-target="#Tab2"> Inserisci manualmente </a>
+			</nav>
+
+			<div class="tab-content">     
+			    <div id="Tab1" class="tab-pane fade show active border" style="padding:20px"> 
+			      <div class="row">
+			        <label class="col-md-2"> corso 1: </label>
+			        <select name="othercourse1" class="form-group col-md-8 custom-select" id="course1">  
+			        	<option  value="">
+			            	--- 
+			            </option>
+			            {% for o in othercourses %}
+			            <option value="{{o.id}}"> 
+			                {{o.id}} | {{o.name}} | {{o.cfu}} cfu
+			            </option>
+			            {% endfor %}
+			        </select>
+			         
+			      </div>
+			      <div class="row">
+			        <label class="col-md-2"> corso 2: </label>
+			        <select name="othercourse2" class="form-group col-md-8 custom-select" id="course2"> 
+			            <option value="">
+			            	--- 
+			            </option> 
+			          {% for o in othercourses %}
+			          <option value="{{o.id}}"> 
+			            {{o.id}} | {{o.name}} | {{o.cfu}} cfu
+			          </option>
+			          {% endfor %}
+			        </select>
+			         
+			      </div>
+			    </div>
+
+			    <div id="Tab2" class="tab-pane fade border">
+			      <p style="text-align:center">Corso 1</p>
+			      <div class="form-row">
+
+			          <span style="padding: 0 20px 0 10px;"> id: </span>
+			          <input class="form-group col-md-2" type="text" name="othercourse1_id">
+
+			          <span style="padding: 0 20px 0 10px;">Nome: </span>
+			          <input class="form-group col-md-5" type="text" name="othercourse1_name">
+
+			          <span style="padding: 0 20px 0 10px;">SSD: </span>
+			          <input class="form-group col-md-1" type="text" name="othercourse1_ssd">
+
+			          <span style="padding: 0 20px 0 10px;">CFU: </span>
+			          <input class="form-group col-md-1" type="number" name="othercourse1_cfu">
+			             
+			      </div>
+			      <hr>
+			      <p style="text-align:center">Corso 2</p>
+			      <div class="form-row">
+
+			          <span style="padding: 0 20px 0 10px;"> id: </span>
+			          <input class="form-group col-md-2" type="text" name="othercourse2_id">
+
+			          <span style="padding: 0 20px 0 10px;">Nome: </span>
+			          <input class="form-group col-md-5" type="text" name="othercourse2_name">
+
+			          <span style="padding: 0 20px 0 10px;">SSD: </span>
+			          <input class="form-group col-md-1" type="text" name="othercourse2_ssd">
+
+			          <span style="padding: 0 20px 0 10px;">CFU: </span>
+			          <input class="form-group col-md-1" type="number" name="othercourse2_cfu">
+			             
+			      </div>
+			    </div>
+			</div>
+		</li>
+	</ul>
+
+	<h4>Inserisci nota al piano di studi</h4>
+	<div class="form-group">
+  		
+  		<textarea class="form-control" id="txtArea" rows="5" cols="100" name="note"></textarea>
+	</div>
+	<h4> Inserisci dati studente </h4> 
+	<div class="form-row border" id="studentdata" style="padding-top: 20px; padding-bottom: 20px">
+		 <label class="form-group col-md-1"> Matricola: </label>
+		  <input class="form-group col-md-3" type="text" name="student">
+
+		  <label class="form-group col-md-1"> Nome: </label>
+		  <input class="form-group col-md-3" type="text" name="firstname">
+
+		  <label class="form-group col-md-1"> Cognome: </label> 
+		  <input class="form-group col-md-3" type="text" name="lastname">
+	</div>
+	
+	<div class="row">
+		<div class="col">
+			<input type="submit" class="btn btn-outline-primary col"  name="submit">
+		</div>
+	</div>
+</form>
+{% else %}
+<h4>Il curriculum selezionato non è valido. Contatta il professore. </h4>
+{% endif %}
+{% endblock %}

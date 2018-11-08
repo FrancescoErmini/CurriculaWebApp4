@@ -1,0 +1,36 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+<h4> Dettagli curriculum </h4>
+<ul>
+	<li>
+	{% for group in curriculum.groups %}
+	<h5> Gruppo {{group.name}} a scelta da {{group.n}} corsi tra:</h5>
+		<table class="table table-bordered">
+
+			{% for course in group.courses %}
+			<tr>
+				<td>
+			      	{{course.id}}
+			    </td>
+			    <td>
+					{{ course.name }}
+			    </td>
+			    <td>
+			    	{{course.cfu}}
+			    </td>
+		    </tr>
+		  {% endfor %}
+		</table>
+	{% endfor %}
+	</li>
+</ul>
+
+	<form action="{{ url_for('indexCurriculum') }}" method="get" class="form-row">
+		<input type="submit" name="submit" value="indietro" class="btn btn-block btn-outline-secondary">
+	</form>
+
+{% endblock %}

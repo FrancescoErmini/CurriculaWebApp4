@@ -1,0 +1,31 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+
+<h4> Gestione gruppi </h4>
+
+<p> Crea un nuovo gruppo: 
+<a href="{{ url_for('createGroup') }}"> <input type="button" value="create" class="btn btn-block btn-outline-success"> </a> 
+</p>
+
+<table class="table table-bordered">
+	<tr>
+		<th>name</th>
+		<th>n</th>
+		<th></th>
+	</tr>
+	{% for g in groups %}
+	<tr>
+		<td> {{g.name}} </td>
+		<td> {{g.n}} </td>
+		<td> <a href="{{ url_for('readGroup' , group_id = g.id) }}"> <input type="button" value="read" class="btn btn-block btn-outline-info"> </a> </td>
+    	<td> <a href="{{ url_for('deleteGroup' , group_id = g.id) }}"> <input type="button" value="delete" class="btn btn-block btn-outline-danger"> </a> </td>
+	</tr>
+    {% endfor %} 
+</table>
+
+
+{% endblock %}

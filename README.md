@@ -1,21 +1,21 @@
 
 Setup Flask, download project files and install required packages:
 ```shell
-mkdir curriculaWebApp && cd curriculaWebApp
+mkdir curriculaWebApp4 && cd curriculaWebApp4
 pip install virtualenv
 virtualenv env
 source env/bin/activate
 git init
-git clone https://github.com/FrancescoErmini/CurriculaWebApp2.git
+git clone https://github.com/FrancescoErmini/CurriculaWebApp4.git
 export FLASK_APP=app.py
 pip install Flask
 pip install -r requirements.txt
 ```
 Create Postgres DB, user and password:
 ```shell
-CREATE USER my_user WITH PASSWORD 'my_password';
-CREATE DATABASE pianodistudio2;
-GRANT ALL PRIVILEGES ON DATABASE my_database TO my_user;
+CREATE USER curricula_admin2 WITH PASSWORD 'password';
+CREATE DATABASE curricula_db
+GRANT ALL PRIVILEGES ON DATABASE curricula_db TO curricula_admin2;
 ```
 Change configuration data in app.py:
 ```shell
@@ -40,31 +40,17 @@ python manage.py db upgrade
 python manage.py runserver
 ```
 
-Once the server is running, try to send a 'application/JSON' POST request i.e create a new academic year:
+Visit the admin page
 ```shell
-curl --header "Content-Type: application/json" --anyauth --user admin:admin --request POST --data '{"id":"2019-2020", "start": "Mon, 03 Sep 2019 00:00:00 GMT", "end": "Mon, 02 Sep 2020 00:00:00 GMT"}' \http://localhost:5000/academicyear/
-```
-Notice 1: all the curl commands for all CRUD operations are listed in:
-
-https://github.com/FrancescoErmini/CurriculaWebApp2/blob/master/utility/curl.txt
-
-Notice 2: A csv parser and it's file are available under the directory `/utility/`
-```python
-python parser.py
+http://localhost:5000/admin
 ```
 
-Admin GUI open is accessible at: 
+From the menu, go to 'Admin' and login with 
+```shell
+username : admin
+password : admin
 
-https://github.com/FrancescoErmini/CurriculaWebApp2/blob/master/client/index.html
+```
+Change username and password
 
-Student GUI is accessible at: 
-
-https://github.com/FrancescoErmini/CurriculaWebApp2/blob/master/client/admin/index.html
-
-
-Note on TODO
-
-https://stackoverflow.com/questions/26868372/calling-rest-api-from-the-same-server
-
-https://help.parsehub.com/hc/en-us/articles/217751808-API-Tutorial-How-to-get-run-data-using-Python-Flask
 

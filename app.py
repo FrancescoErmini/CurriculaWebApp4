@@ -199,7 +199,34 @@ def studyplan(studyplan_id):
 #Home
 @app.route('/admin', methods=['GET'] )
 def admin():
-    return render_template('admin/index.html') 
+
+    check_validation = dict()
+    studyplan_counter = dict()
+
+    curricula = Curricula.query.all()
+    groups = Groups.query.all()
+    studyplans = Studyplans.query.all()
+
+    studyplan_tot = len(studyplans)
+
+    for studyplan in studyplans:
+        try:
+            studyplan_counter[studyplan.curriculum_id] = studyplan_counter[studyplan.curriculum_id] + 1
+        except Exception as e:
+            studyplan_counter[studyplan.curriculum_id] = 0
+
+    for curriculum in curricula:
+        if not validateCurriculum(curriculum):
+            check_validation[curriculum.title] = False
+        else:
+            check_validation[curriculum.title] = True
+
+    for group in groups:
+        if not isValidGroup(group):
+            check_validation[group.name] = False
+        else:
+            check_validation[group.name] = True
+    return render_template('admin/index.html', curricula=curricula, groups = groups, check_validation = check_validation,  studyplan_counter=studyplan_counter, studyplan_tot=studyplan_tot) 
     
 #change username and  passord
 @app.route('/admin/passwd', methods=['GET','POST'])
@@ -487,7 +514,7 @@ def createCurriculum():
         curriculum_ac = request.form['academicyear']
         curriculum_desc = request.form['desc']
         curriculum_groups_id = request.form.getlist("group_id[]")
-        curriculum = Curricula(title=curriculum_title, ac=curriculum_ac, desc=curriculum_ac)
+        curriculum = Curricula(title=curriculum_title, ac=curriculum_ac, desc=curriculum_desc)
         for group_id in curriculum_groups_id:
             group = Groups.query.get(group_id)
             curriculum.groups.append(group)
@@ -535,10 +562,10 @@ def isValidCourse(course):
 
 def isValidGroup(group):
     res = True
-    if len(group.courses) < 3:
+    if len(group.courses) < 2:
         res = False
         flash("Errore. Un gruppo deve contenere almeno 2 corsi")
-    if group.n < 2:
+    if group.n < 1:
         res = False
         flash("Errore. Il numero n di corsi sceglibili deve essere almeno 1")
     if len(group.courses) <= group.n:
@@ -550,9 +577,20 @@ def isValidGroup(group):
 def validateCurriculum(curriculum):
     uniqueCourses = []
     res = True
-    if len(curriculum.groups) == 0:
-        flash("error, misconfiguration. This curriculum has zero courses")
+    if curriculum.groups is None:
+        flash("Errore. Un gruppi cancellati")
         res = False
+    if len(curriculum.groups) == 0:
+        flash("Errore. Il curriculum " + curriculum.title + " ha zero corsi. Contatta l'amministratore.")
+        res = False
+
+    cfu_tot = 0
+    for g in curriculum.groups:
+        cfu_tot = cfu_tot + g.n * g.courses[0].cfu
+    if cfu_tot < 84:
+        flash("Errore. Il curriculum " + curriculum.title + " ha un numero di corsi sceglibili insufficenti al raggiungimento di 84 cfu.")
+        res = False
+    '''
     for g in curriculum.groups:
         for c in g.courses:
 
@@ -561,6 +599,7 @@ def validateCurriculum(curriculum):
             else:
                 flash("Attenzione il corso " + c.id + " e' presente anche nel gruppo " + g.name )
                 res = False
+    '''
     return res
 
 def isValidStudent(student):

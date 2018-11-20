@@ -11,5 +11,52 @@
 	<li><a href="{{url_for('indexCurriculum')}}">Curriculum index</a></li>
 </ul>
 
+<h1>{{studyplan_tot}} Piani di studio registrati</h1>
+	{% for curriculum in curricula %}
+	<h2> {{studyplan_counter[curriculum.id]}} in {{curriculum.title}} </h2>
+	{% endfor %}
+
+
+<h4>Curriculum control panel</h4>
+<table class="table table-bordered">
+	<th>Nome</th>
+	<th>Status</th>
+{% for curriculum in curricula %}
+<tr>
+	<td>
+	{{curriculum.title}}
+	</td>
+	<td style="width:15%">
+	{% if check_validation[curriculum.title] %}
+	<span style="color:green"> valid </span>
+	{% else %}
+	<span style="color:red"> error </span>
+	{% endif %}
+	</td>
+</tr>
+{% endfor %}
+</table>
+
+<h4>Group control panel</h4>
+<table class="table table-bordered">
+	<th>Nome</th>
+	<th>Status</th>
+{% for group in groups %}
+<tr>
+	<td>
+	{{group.name}}
+	</td>
+	<td style="width: 15%">
+	{% if check_validation[group.name] %}
+	<span style="color:green"> valid</span>
+	{% else %}
+	<span style="color:red;"> error</span>
+	{% endif %}
+	</td>
+</tr>
+{% endfor %}
+</table>
+
+
 </div>
 {% endblock %}

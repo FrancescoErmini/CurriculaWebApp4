@@ -17,7 +17,7 @@ class Base(db.Model):
 class Admin(Base):
     __tablename__ = 'admin'
     idd = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=True)
+    username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String(300), nullable=False)
 
     def __init__(self, idd, username, password):
@@ -111,10 +111,10 @@ class Studyplans(Base):
     
     courses = db.relationship('Courses', secondary='studyplan_courses_association')
     othercourses = db.relationship('OtherCourses', secondary='studyplan_othercourses_association')
-    note = db.Column(db.String(2000))
+    note = db.Column(db.String(2000), nullable=True)
 
     #backref serve a fare il delete di curriculum senza avere errore di violazione integrita per via della foreign key.
-    curriculum = db.relationship('Curricula', backref=db.backref('studyplans', uselist=False))
+    curriculum = db.relationship('Curricula', backref=db.backref('studyplans', uselist=False,  cascade='all,delete'))
 
     def __init__(self, id, curriculum_id):
         self.id = id
@@ -124,7 +124,7 @@ class Studyplans(Base):
 
 class Academicyears(Base):
     __tablename__ = 'academicyears'
-    id = db.Column(db.String(9), primary_key=True, nullable=False )
+    id = db.Column(db.String(9), primary_key=True)
     #start = db.Column(db.DateTime, n)
     #end = db.Column(db.DateTime)
 
@@ -147,6 +147,6 @@ studyplan_courses_association = db.Table('studyplan_courses_association', Base.m
     db.Column('course_id', db.String(7), db.ForeignKey('courses.id',  ondelete='cascade'), nullable=True))
 
 
-studyplan_courses_association = db.Table('studyplan_othercourses_association', Base.metadata,
+studyplan_othercourses_association = db.Table('studyplan_othercourses_association', Base.metadata,
     db.Column('studyplan_id', db.String(7), db.ForeignKey('studyplans.id')),
     db.Column('othercourse_id', db.String(7), db.ForeignKey('othercourses.id',  ondelete='cascade'), nullable=True))

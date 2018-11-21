@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Requirements}{}% 1
+\BOOKMARK [1][-]{section.2}{Data model}{}% 2
+\BOOKMARK [1][-]{section.3}{Project Setup and structure}{}% 3
+\BOOKMARK [1][-]{section.4}{Validazione}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{validazione e vincoli sui dati}{section.4}% 5
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Academicyear}{subsection.4.1}% 6
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Course}{subsection.4.1}% 7
+\BOOKMARK [3][-]{subsubsection.4.1.3}{Student}{subsection.4.1}% 8
+\BOOKMARK [3][-]{subsubsection.4.1.4}{Studyplan}{subsection.4.1}% 9
+\BOOKMARK [3][-]{subsubsection.4.1.5}{Group}{subsection.4.1}% 10
+\BOOKMARK [3][-]{subsubsection.4.1.6}{Curriculum}{subsection.4.1}% 11
+\BOOKMARK [1][-]{section.5}{Vincoli su creazione e cancellazione}{}% 12
+\BOOKMARK [2][-]{subsection.5.1}{Cancellazione di un corso}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.2}{cancellazione di un gruppo}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.3}{cancellazione di un curriculum}{section.5}% 15
+\BOOKMARK [1][-]{section.6}{Page navigation}{}% 16
+\BOOKMARK [1][-]{section.7}{CSV Parser}{}% 17

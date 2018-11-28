@@ -1,15 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'admin/template.html' %}
 
 {% block header %}
-<h2> {% block title %} Piano di studio in ingegneria informatica magistrale - Unifi {% endblock %}</h2>
 {% endblock %}
 {% block content %}
 <h4> Curriculum: {{studyplan.curriculum.title}} per a.a {{studyplan.curriculum.ac}} </h4>
 
 
-<p> Matricola: {{student.id}}</p>
-<p> Nome: {{student.firstname}}</p>
-<p> Cognome: {{student.lastname}}</p>
+<p> Matricola: {{studyplan.student.id}}</p>
+<p> Nome: {{studyplan.student.firstname}}</p>
+<p> Cognome: {{studyplan.student.lastname}}</p>
 
 <table class="table table-bordered">
 
@@ -17,6 +16,8 @@
 	<th> nome </th>
     <th> cfu </th>
     <th> ssd </th>
+
+
 
 	{% for course in studyplan.courses %}
 	<tr>
@@ -38,19 +39,15 @@
         <td>{{othercourse.ssd}}</td>
     </tr>
     {% endfor %}
-
-    <tr>
+     <tr>
         <td colspan="4" style="text-align: center;"> <i> Nota studente </i></td>
     </tr>
      <tr>
         <td colspan="4" style="text-align: left;">  {{studyplan.note}} </td>
     </tr>
+
    
 </table> 
-<div style="float: right;margin-top: : 100px;padding-top:50px;height: 50px;">
-Firma  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _  _ _ _ 
-</div>
-
 
 
 	

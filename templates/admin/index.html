@@ -4,17 +4,12 @@
 {% endblock %}
 {% block content %}
 <div class="container-fluid">
-<ul>
-	<li><a href="{{url_for('indexAcademicyear')}}">Academic year</a></li>
-	<li><a href="{{url_for('indexCourse')}}">Course index</a></li>
-	<li><a href="{{url_for('indexGroup')}}">Group index</a></li>
-	<li><a href="{{url_for('indexCurriculum')}}">Curriculum index</a></li>
-</ul>
 
-<h1>{{studyplan_tot}} Piani di studio registrati</h1>
-	{% for curriculum in curricula %}
-	<h2> {{studyplan_counter[curriculum.id]}} in {{curriculum.title}} </h2>
-	{% endfor %}
+
+<p>Piani di studio registrati = {{studyplan_tot}} </p>
+{% for curriculum in curricula %} 
+<p> {{curriculum.title}} : {{studyplan_counter[curriculum.id]}} </p>
+{% endfor %}
 
 
 <h4>Curriculum control panel</h4>

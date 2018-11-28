@@ -1,12 +1,12 @@
-
 import json
 import os
 import sys
 import string
+import pdfkit
 from functools import wraps
 
 import click
-from flask import Flask, jsonify, render_template, url_for, request, redirect, flash, abort
+from flask import Flask, jsonify, render_template, url_for, request, redirect, flash, abort, make_response
 from flask_simplelogin import SimpleLogin, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -75,10 +75,13 @@ def init_user_password():
         print "Warning: change user and password after first boot. default is admin:admin\n" 
 
     else:
+        pass
+        '''
         admin = Admin.query.get(0)
         admin.username = 'admin'
         admin.password = generate_password_hash('admin',  method='pbkdf2:sha256')
         db.session.commit()
+        '''
 
 
 
@@ -93,103 +96,90 @@ def init_user_password():
 @app.route('/', methods=['GET'])
 def curricula():   
     curricula = Curricula.query.all()
-    return render_template('curricula.html', curricula=curricula) 
+    validCurricula = []
+    for curriculum in curricula:
+        if isValidCurriculum(curriculum):
+            validCurricula.append(curriculum)
+    return render_template('curricula.html', curricula=validCurricula) 
 
 @app.route('/curriculum/<int:curriculum_id>', methods=['GET','POST'])
 def curriculum(curriculum_id):
     if request.method == 'GET':
         curriculum = Curricula.query.get(curriculum_id)
-        valid_curriculum = validateCurriculum(curriculum)
+        valid_curriculum = isValidCurriculum(curriculum)
         groups = curriculum.groups
         othercourses = OtherCourses.query.filter(OtherCourses.cfu==6).all()
-
         return render_template('curriculum.html', curriculum=curriculum, groups = groups, othercourses=othercourses, valid_curriculum=valid_curriculum)
+    
     if request.method == 'POST':
 
-        student_id = request.form['student']
-        student_firstname = request.form['firstname']
-        student_lastname = request.form['lastname']
+        student = createStudent(student_id=request.form['student'], student_firstname = request.form['firstname'], student_lastname = request.form['lastname'] )
+        studyplan = createStudyplan(studyplan_id=request.form['student'], curriculum_id=curriculum_id )
+        studyplan.student = student
+        studyplan.note = request.form['note']
 
-  
-        if Students.query.get(student_id) is None:
-            student = Students(id=student_id)
-            student.firstname = student_firstname
-            student.lastname = student_lastname
-        else:
-            student = Students.query.get(student_id)
-
-        # Studyplan_id is equals to student_id
-        if Studyplans.query.get(student_id) is None:
-            studyplan = Studyplans(id=student_id, curriculum_id=curriculum_id)
-        else:
-            studyplan = Studyplans.query.get(student_id)
-
-        studyplan_note = request.form['note']
-        
-        studyplan_courses_id = request.form.getlist("course_id[]")
-
-        if request.form['othercourse1'] != "" and request.form['othercourse2'] != "":
-            othercourse1 = OtherCourses.query.get(request.form['othercourse1'])
-            othercourse2 = OtherCourses.query.get(request.form['othercourse2'])
-        else:
-            othercourse1_id = request.form['othercourse1_id']
-            othercourse1_name = request.form['othercourse1_name']
-            othercourse1_cfu = request.form['othercourse1_cfu']
-            othercourse1_ssd = request.form['othercourse1_ssd']
-            othercourse2_id = request.form['othercourse2_id']
-            othercourse2_name = request.form['othercourse2_name']
-            othercourse2_cfu = request.form['othercourse2_cfu']
-            othercourse2_ssd = request.form['othercourse2_ssd']
-            if OtherCourses.query.get(othercourse1_id) is None:
-                othercourse1 = OtherCourses(id=othercourse1_id, name=othercourse1_name, cfu=othercourse1_cfu, ssd=othercourse1_ssd)
-                othercourse2 = OtherCourses(id=othercourse2_id, name=othercourse2_name, cfu=othercourse2_cfu, ssd=othercourse2_ssd)
-            else:
-                othercourse1 = OtherCourses.query.get(othercourse1_id)
-                othercourse2 = OtherCourses.query.get(othercourse2_id)
-                othercourse1.id = othercourse1_id
-                othercourse1.name = othercourse1_name
-                othercourse1.cfu = othercourse1_cfu
-                othercourse1.ssd = othercourse1_ssd
-                othercourse2.id = othercourse2_id
-                othercourse2.name = othercourse2_name
-                othercourse2.cfu = othercourse2_cfu
-                othercourse2.ssd = othercourse2_ssd
-
-        '''
-        CREATE STUDYPLAN OBJ
-        '''
-
-        for course_id in studyplan_courses_id:
+        for course_id in request.form.getlist("course_id[]"):
             course = Courses.query.get(course_id)
             studyplan.courses.append(course)
-
+        othercourse1 = createOthercourse(request.form['othercourse1'], request.form['othercourse1_id'], request.form['othercourse1_name'], request.form['othercourse1_cfu'], request.form['othercourse1_ssd'] )
+        othercourse2 = createOthercourse(request.form['othercourse2'], request.form['othercourse2_id'], request.form['othercourse2_name'], request.form['othercourse2_cfu'], request.form['othercourse2_ssd'] )
         studyplan.othercourses.append(othercourse1)
         studyplan.othercourses.append(othercourse2)
-        studyplan.note = studyplan_note
-        student.studyplan.append(studyplan)
-
+        
         if not isValidStudyplan(studyplan) or not isValidStudent(student):
             return redirect(url_for('curriculum', curriculum_id=curriculum_id))
-        
+
+        db.session.add(student)
         db.session.add(studyplan)
         db.session.commit()
         return redirect('/studyplan/'+str(studyplan.id))
   
-
-
 @app.route('/studyplan/<string:studyplan_id>', methods=['GET','POST'])
 def studyplan(studyplan_id):
     studyplan = Studyplans.query.get(studyplan_id)
     student = Students.query.get(studyplan_id)
+    studyplanDoc = render_template('studyplan.html', studyplan=studyplan, student=student)
+    pdf = pdfkit.from_string(studyplanDoc, False)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=pianodistudi.pdf' 
+    return response
 
-    return render_template('studyplan.html', studyplan=studyplan, student=student)
 
 
+def createStudyplan(studyplan_id, curriculum_id):   
+    #Studyplan_id is equals to student_id
+    if Studyplans.query.get(studyplan_id) is None:
+        studyplan = Studyplans(id=studyplan_id, curriculum_id=curriculum_id)
+    else:
+        studyplan = Studyplans.query.get(studyplan_id)
+    return studyplan
 
 
+def createStudent(student_id, student_firstname, student_lastname):
 
+    if Students.query.get(student_id) is None:
+        student = Students(id=student_id)
+        student.firstname = student_firstname
+        student.lastname = student_lastname
+    else:
+        student = Students.query.get(student_id)
 
+    return student
 
+def createOthercourse(othercourse_from_list, othercourse_id, othercourse_name, othercourse_cfu, othercourse_ssd):
+    # se il corso e' stato selezionato dalla lista lo si recupera altrimenti lo si crea. 
+    if othercourse_from_list != "":
+        othercourse = OtherCourses.query.get(othercourse_from_list)
+    else:
+        if OtherCourses.query.get(othercourse_id) is None:
+            othercourse = OtherCourses(id=othercourse_id, name=othercourse_name, cfu=othercourse_cfu, ssd=othercourse_ssd)
+        else:
+            othercourse = OtherCourses.query.get(othercourse_id)
+            othercourse.name = othercourse_name
+            othercourse.cfu = othercourse_cfu
+            othercourse.ssd = othercourse_ssd
+    return othercourse
 
 
 #########################################   SEZIONE ADMIN  ##################################################
@@ -216,7 +206,7 @@ def admin():
             studyplan_counter[studyplan.curriculum_id] = 0
 
     for curriculum in curricula:
-        if not validateCurriculum(curriculum):
+        if not isValidCurriculum(curriculum):
             check_validation[curriculum.title] = False
         else:
             check_validation[curriculum.title] = True
@@ -519,19 +509,31 @@ def createCurriculum():
             group = Groups.query.get(group_id)
             curriculum.groups.append(group)
         #validate obj
-        if validateCurriculum(curriculum):
+        if isValidCurriculum(curriculum):
             db.session.add(curriculum)
             db.session.commit()    
         return redirect(url_for('indexCurriculum')) 
 
- 
+@app.route('/admin/studyplan/index', methods=['GET'])
+@login_required
+def indexStudyplan():
+    studyplans = Studyplans.query.all()
+    return render_template('admin/studyplan/index.html', studyplans=studyplans)
+
+
+@app.route('/admin/studyplan/read/<string:studyplan_id>', methods=['GET'])
+@login_required
+def readStudyplan(studyplan_id):
+    studyplan = Studyplans.query.get(studyplan_id)
+    return render_template('admin/studyplan/read.html', studyplan=studyplan)
+
+
 
 def isValidAcademicyear(academicyear):
-
     res = True    
     if academicyear.id == "":
         flash("Hai inserito un anno accademico vuoto")
-        return False # return here is the string is empty
+        return False
     years = string.split(academicyear.id, '-')
     if len(years) < 2:
         flash("Attenzione formato errato. usa il segno meno per separare gli anni solari")
@@ -543,6 +545,9 @@ def isValidAcademicyear(academicyear):
         flash("Attenzione, l'anno accademico deve essere nella forma <year> - <year+1>")
         res = False
     return res
+
+
+
 
 def isValidCourse(course):
     res = True
@@ -562,6 +567,12 @@ def isValidCourse(course):
 
 def isValidGroup(group):
     res = True
+    if group.name == "":
+        flash("Errore. Il nome del gruppo non deve essere vuoto")
+        res = False
+    if group.courses is None:
+        flash("Errore. Il gruppo " + group.name + " ha zero corsi")
+        return False #previene errori nelle funzioni successive dovuti al fatto che groups sia null
     if len(group.courses) < 2:
         res = False
         flash("Errore. Un gruppo deve contenere almeno 2 corsi")
@@ -574,15 +585,20 @@ def isValidGroup(group):
     return res
 
 
-def validateCurriculum(curriculum):
-    uniqueCourses = []
+def isValidCurriculum(curriculum):
     res = True
-    if curriculum.groups is None:
-        flash("Errore. Un gruppi cancellati")
+
+    if curriculum.title == "":
+        flash("Errore. Il titolo del curriculum non deve essere vuoto")
         res = False
-    if len(curriculum.groups) == 0:
-        flash("Errore. Il curriculum " + curriculum.title + " ha zero corsi. Contatta l'amministratore.")
-        res = False
+
+    if curriculum.groups is None:      
+        flash("Errore. Il curriculum " + curriculum.title + " ha zero gruppi. Contatta l'amministratore.")
+        return False #previene errori nelle funzioni successive dovuti al fatto che groups sia null
+
+    for group in curriculum.groups:
+        if not isValidGroup(group):
+            res = False
 
     cfu_tot = 0
     for g in curriculum.groups:
@@ -590,16 +606,15 @@ def validateCurriculum(curriculum):
     if cfu_tot < 84:
         flash("Errore. Il curriculum " + curriculum.title + " ha un numero di corsi sceglibili insufficenti al raggiungimento di 84 cfu.")
         res = False
-    '''
+    
+    uniqueCourses = []
     for g in curriculum.groups:
         for c in g.courses:
-
-            if c.id not in uniqueCourses:
-                uniqueCourses.append(c.id)
+            if c.name not in uniqueCourses:
+                uniqueCourses.append(c.name)
             else:
-                flash("Attenzione il corso " + c.id + " e' presente anche nel gruppo " + g.name )
+                flash("Attenzione il corso " + c.id + " " + c.name + " nel gruppo " + g.name + " e' duplicato per il curriculum " + curriculum.title )
                 res = False
-    '''
     return res
 
 def isValidStudent(student):
@@ -612,42 +627,16 @@ def isValidStudent(student):
         res = False
     return res
 
+#curriculum_id  e' sempre giusto. In caso fosse sbagliato si avrebbe un errore di pagina non trovata.
 
 def isValidStudyplan(studyplan):
     res = True
+    # Controllo vincoli su corsi a scelta vincolata
+    if studyplan.courses is None:
+        flash("Errore. Nessun corso a scelta vincolata specificato.")
+        return False
+
     curriculum = Curricula.query.get(studyplan.curriculum_id)
-
-    n_course = 0
-    for group in curriculum.groups:
-        n_course = n_course + group.n
-
-    if len(studyplan.courses) < n_course:
-        flash("Errore. Devi inserire almeno " + str(n_course) + " corsi")
-        res = False
-    if len(studyplan.othercourses) < 2:
-        flash("Errore. Devi inserire almeno 2 corsi a scelta libera")
-        res = False
-
-    if len(studyplan.othercourses[0].id) != 7 and len(studyplan.othercourses[1].id) != 7:
-        flash("Errore. Uno dei codici degli esami a scelta libera potrebbe essere sbagliato")
-        res = False
-
-    uniqueCourses = []
-    for course in studyplan.courses:
-        if course.name not in uniqueCourses:
-            uniqueCourses.append(course.name)
-        else:
-            flash("Errore. Il corso " + course.name +" risulta duplicato nel piano di studi")
-            res = False
-            
-    for course in studyplan.courses:
-        if course.id == studyplan.othercourses[0].id or course.id == studyplan.othercourses[1].id:
-            flash("Errore. Hai inserito tra i corsi a scelta libera un corso gia' presente tra quelli a scelta vincolata")
-            res = False
-        if course.name == studyplan.othercourses[0].name or course.name == studyplan.othercourses[1].name:
-            flash("Errore. Non puoi inserire tra i corsi a scelta libera un corso gia' presente con cfu diversi")
-            res = False
-
 
     for group in curriculum.groups:
             count=0
@@ -658,12 +647,31 @@ def isValidStudyplan(studyplan):
                 flash("Errore. Nel gruppo " + str(group.name) +" hai inserito " +str(count)+" corsi. Devi inserirene almeno " + str(group.n) )
                 res = False
 
+    if studyplan.othercourses is None:
+        flash("Errore. Nessun corso a scelta libera specificato")
+        return False
+    if len(studyplan.othercourses) < 2:
+        flash("Errore. Devi inserire almeno 2 corsi a scelta libera")
+        res = False
+    if len(studyplan.othercourses[0].id) != 7 and len(studyplan.othercourses[1].id) != 7:
+        flash("Errore. Il codice esame ha una lunghezza di 7 caratteri")
+        res = False
+            
+    for course in studyplan.courses:
+        if course.id == studyplan.othercourses[0].id or course.id == studyplan.othercourses[1].id:
+            flash("Errore. Il corso a scelta libera con codice " + course.id + " e' duplicato nel piano di studi." )
+            res = False
+        if course.name == studyplan.othercourses[0].name or course.name == studyplan.othercourses[1].name:
+            flash("Errore. Il corso a scelta libera con nome " + course.name + " e' gia presente nel piano di studi con cfu=" + course.cfu)
+            res = False
+    '''
     cfu_tot = 0
     for course in studyplan.courses:
         cfu_tot = cfu_tot + course.cfu
-    if cfu_tot < 8:
+    if cfu_tot < 84:
         flash("Errore. Il numero di cfu totali dei corsi a scelta vincolata deve essere almeno 84")
         res = False
+    '''
     if (studyplan.othercourses[0].cfu + studyplan.othercourses[1].cfu) < 12:
         flash("Errore. Il numero di cfu per i corsi a scelta libera deve essere almeno 12")
         res = False

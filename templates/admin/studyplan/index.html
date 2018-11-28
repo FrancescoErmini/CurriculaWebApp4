@@ -1,0 +1,27 @@
+{% extends 'admin/template.html' %}
+
+{% block header %}
+{% endblock %}
+{% block content %}
+
+
+<h4> Gestione piani di studio </h4>
+
+
+<table class="table table-bordered">
+	<tr>
+		<th>matricola</th>
+		<th>curriculum</th>
+		<th></th>
+	</tr>
+	{% for s in studyplans %}
+	<tr>
+		<td> {{s.id}} </td>
+		<td> {{s.curriculum.title}} </td>
+		<td> <a href="{{ url_for('readStudyplan' , studyplan_id = s.id) }}"> <input type="button" value="read" class="btn btn-block btn-outline-info"> </a> </td>
+	</tr>
+    {% endfor %} 
+</table>
+
+
+{% endblock %}

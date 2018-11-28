@@ -31,10 +31,9 @@ class Groups(Base):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     n = db.Column(db.Integer, nullable=False)
-    #cfu = db.Column(db.Integer, nullable=True)
 
     courses = db.relationship('Courses', secondary='groups_courses_association')
-    curricula = db.relationship('Curricula', secondary='curricula_groups_association')
+    #curricula = db.relationship('Curricula', secondary='curricula_groups_association')
 
     def __init__(self, name):
         self.name = name
@@ -95,9 +94,6 @@ class Students(Base):
     firstname = db.Column(db.String(20))
     lastname = db.Column(db.String(20))
 
-    #studyplan = db.relationship('Studyplans', backref=db.backref('students', uselist=False))
-    studyplan = db.relationship('Studyplans', backref=db.backref('students', uselist=False))
-
     def __init__(self, id):
         self.id = id
     def __repr__(self):
@@ -106,13 +102,14 @@ class Students(Base):
 
 class Studyplans(Base):
     __tablename__ = 'studyplans'
-    id = db.Column(db.String(7), db.ForeignKey('students.id'), primary_key=True)
+    id = db.Column(db.String(7), db.ForeignKey('students.id', ondelete='CASCADE'), primary_key=True)
     curriculum_id = db.Column(db.Integer, db.ForeignKey('curricula.id'))
-    
-    courses = db.relationship('Courses', secondary='studyplan_courses_association')
-    othercourses = db.relationship('OtherCourses', secondary='studyplan_othercourses_association')
     note = db.Column(db.String(2000), nullable=True)
 
+    student = db.relationship('Students', backref=db.backref('studyplans', uselist=False), cascade='delete')
+
+    courses = db.relationship('Courses', secondary='studyplan_courses_association')
+    othercourses = db.relationship('OtherCourses', secondary='studyplan_othercourses_association')
     #backref serve a fare il delete di curriculum senza avere errore di violazione integrita per via della foreign key.
     curriculum = db.relationship('Curricula', backref=db.backref('studyplans', uselist=False,  cascade='all,delete'))
 
@@ -136,17 +133,17 @@ class Academicyears(Base):
 #http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html#many-to-many
 groups_courses_association = db.Table('groups_courses_association', Base.metadata,
     db.Column('group_id', db.Integer, db.ForeignKey('groups.id')),
-    db.Column('course_id', db.String(7), db.ForeignKey('courses.id',  ondelete='cascade'), nullable=True))
+    db.Column('course_id', db.String(7), db.ForeignKey('courses.id',  ondelete='cascade')))
 
 curricula_groups_association = db.Table('curricula_groups_association', Base.metadata,
     db.Column('curriculum_id', db.Integer, db.ForeignKey('curricula.id')),
-    db.Column('group_id',  db.Integer, db.ForeignKey('groups.id')))
+    db.Column('group_id',  db.Integer, db.ForeignKey('groups.id',  ondelete='cascade')))
 # ondelete='cascade' allow to delete course_id - studyplan rows when course_id is deleted.
 studyplan_courses_association = db.Table('studyplan_courses_association', Base.metadata,
     db.Column('studyplan_id', db.String(7), db.ForeignKey('studyplans.id')),
-    db.Column('course_id', db.String(7), db.ForeignKey('courses.id',  ondelete='cascade'), nullable=True))
+    db.Column('course_id', db.String(7), db.ForeignKey('courses.id',  ondelete='cascade')))
 
 
 studyplan_othercourses_association = db.Table('studyplan_othercourses_association', Base.metadata,
     db.Column('studyplan_id', db.String(7), db.ForeignKey('studyplans.id')),
-    db.Column('othercourse_id', db.String(7), db.ForeignKey('othercourses.id',  ondelete='cascade'), nullable=True))
+    db.Column('othercourse_id', db.String(7), db.ForeignKey('othercourses.id',  ondelete='cascade')))

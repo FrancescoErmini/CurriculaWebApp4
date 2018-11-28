@@ -111,7 +111,7 @@ class Studyplans(Base):
     courses = db.relationship('Courses', secondary='studyplan_courses_association')
     othercourses = db.relationship('OtherCourses', secondary='studyplan_othercourses_association')
     #backref serve a fare il delete di curriculum senza avere errore di violazione integrita per via della foreign key.
-    curriculum = db.relationship('Curricula', backref=db.backref('studyplans', uselist=False,  cascade='all,delete'))
+    curriculum = db.relationship('Curricula', uselist=False) # backref=db.backref('studyplans', uselist=False,  cascade='all,delete'))
 
     def __init__(self, id, curriculum_id):
         self.id = id

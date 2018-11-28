@@ -15,6 +15,7 @@ from os import environ
 
 from flask_simplelogin import SimpleLogin, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
@@ -484,8 +485,13 @@ def deleteCurriculum(curriculum_id):
     elif request.method == 'POST':
         if request.form['delete'] == 'delete':
             curriculum = Curricula.query.get(curriculum_id)
-            db.session.delete(curriculum)
-            db.session.commit()
+            try:
+                db.session.delete(curriculum)
+                db.session.commit()
+                #db.session.flush()
+            except IntegrityError as e:
+                db.session.rollback()
+                flash("Errore. Non puoi cancellare il curriculum. E' ancora presente in qualche piano di studi")
             return redirect(url_for('indexCurriculum'))
         elif request.form['delete'] == 'undo':
             return redirect(url_for('indexCurriculum'))
@@ -527,6 +533,30 @@ def readStudyplan(studyplan_id):
     studyplan = Studyplans.query.get(studyplan_id)
     return render_template('admin/studyplan/read.html', studyplan=studyplan)
 
+
+@app.route('/admin/studyplans/delete', methods=['GET','POST'])
+@login_required
+def deleteStudyplans():
+    if request.method == 'GET':
+        academicyears = Academicyears.query.all()
+        return render_template('/admin/studyplan/delete.html', academicyears=academicyears)
+    elif request.method == 'POST':
+        if request.form['delete'] == 'delete':
+            curriculum_ac = request.form['academicyear']
+            q = db.session.query(Studyplans).join(Curricula, Curricula.id == Studyplans.curriculum_id).filter(Curricula.ac == curriculum_ac).all()
+
+            studyplans_to_delete = q
+       
+            for studyplan in studyplans_to_delete:
+                db.session.delete(studyplan)
+            db.session.commit()
+            db.session.flush()
+            return redirect(url_for('indexStudyplan'))
+           
+        elif request.form['delete'] == 'undo':
+            return redirect(url_for('indexStudyplan'))
+        else:
+            return 'error: unknown action'
 
 
 def isValidAcademicyear(academicyear):

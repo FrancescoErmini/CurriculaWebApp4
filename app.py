@@ -3,6 +3,7 @@ import os
 import sys
 import string
 import pdfkit
+import datetime
 from functools import wraps
 
 import click
@@ -95,13 +96,26 @@ def init_user_password():
 
 
 @app.route('/', methods=['GET'])
-def curricula():   
-    curricula = Curricula.query.all()
+def curricula():
+    current_academic_year = getCurrentAcademicyear()
+
+    curricula = db.session.query(Curricula).filter(Curricula.ac==current_academic_year)
+    old_curricula = db.session.query(Curricula).filter(Curricula.ac!=current_academic_year)
+
     validCurricula = []
     for curriculum in curricula:
         if isValidCurriculum(curriculum):
             validCurricula.append(curriculum)
-    return render_template('curricula.html', curricula=validCurricula) 
+    return render_template('curricula.html', curricula=validCurricula, old_curricula=old_curricula) 
+
+def getCurrentAcademicyear():
+    now = datetime.datetime.now()
+    current_academic_year = str(now.year)+"-"+str(now.year+1)
+    return current_academic_year
+
+
+
+
 
 @app.route('/curriculum/<int:curriculum_id>', methods=['GET','POST'])
 def curriculum(curriculum_id):
@@ -580,7 +594,7 @@ def isValidAcademicyear(academicyear):
     if len(years) < 2:
         flash("Attenzione formato errato. usa il segno meno per separare gli anni solari")
         return False
-    if int(years[0]) < 2018 or int(years[0]) > 2023:
+    if int(years[0]) < 2016 or int(years[0]) > 2023:
         flash("Attenzione, forse hai inserito un anno accademico errato. L'anno deve essere compreso tra 2018-2019 e 2023-2024")
         res = False
     if (int(years[0]) + 1) != int(years[1]):

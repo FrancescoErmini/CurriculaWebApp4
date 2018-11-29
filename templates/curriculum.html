@@ -50,13 +50,13 @@
 			    <div id="Tab1" class="tab-pane fade show active border" style="padding:20px"> 
 			      <div class="row">
 			        <label class="col-md-2"> corso 1: </label>
-			        <select name="othercourse1" class="form-group col-md-8 custom-select" id="course1">  
+			        <select name="course1" class="form-group col-md-8 custom-select" id="course1">  
 			        	<option  value="">
 			            	--- 
 			            </option>
-			            {% for o in othercourses %}
-			            <option value="{{o.id}}"> 
-			                {{o.id}} | {{o.name}} | {{o.cfu}} cfu
+			            {% for c in courses %}
+			            <option value="{{c.id}}"> 
+			                {{c.id}} | {{c.name}} | {{c.cfu}} cfu
 			            </option>
 			            {% endfor %}
 			        </select>
@@ -64,13 +64,13 @@
 			      </div>
 			      <div class="row">
 			        <label class="col-md-2"> corso 2: </label>
-			        <select name="othercourse2" class="form-group col-md-8 custom-select" id="course2"> 
+			        <select name="course2" class="form-group col-md-8 custom-select" id="course2"> 
 			            <option value="">
 			            	--- 
 			            </option> 
-			          {% for o in othercourses %}
-			          <option value="{{o.id}}"> 
-			            {{o.id}} | {{o.name}} | {{o.cfu}} cfu
+			          {% for c in courses %}
+			          <option value="{{c.id}}"> 
+			            {{c.id}} | {{c.name}} | {{c.cfu}} cfu
 			          </option>
 			          {% endfor %}
 			        </select>
@@ -93,7 +93,9 @@
 
 			          <span style="padding: 0 20px 0 10px;">CFU: </span>
 			          <input class="form-group col-md-1" type="number" name="othercourse1_cfu">
-			             
+
+			          <span  style="padding: 0 20px 0 10px;">Giustificazione:</span>
+			          <textarea class="form-group col-md-9" rows="5" id="comment" name="othercourse1_note"></textarea>  
 			      </div>
 			      <hr>
 			      <p style="text-align:center">Corso 2</p>
@@ -110,7 +112,8 @@
 
 			          <span style="padding: 0 20px 0 10px;">CFU: </span>
 			          <input class="form-group col-md-1" type="number" name="othercourse2_cfu">
-			             
+			           <span style="padding: 0 20px 0 10px;">Giustificazione:</span>
+			          <textarea class="form-group col-md-9" rows="5" id="comment" name="othercourse2_note"></textarea>  
 			      </div>
 			    </div>
 			</div>

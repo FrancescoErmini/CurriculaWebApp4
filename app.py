@@ -109,8 +109,8 @@ def curriculum(curriculum_id):
         curriculum = Curricula.query.get(curriculum_id)
         valid_curriculum = isValidCurriculum(curriculum)
         groups = curriculum.groups
-        othercourses = OtherCourses.query.filter(OtherCourses.cfu==6).all()
-        return render_template('curriculum.html', curriculum=curriculum, groups = groups, othercourses=othercourses, valid_curriculum=valid_curriculum)
+        courses = db.session.query(Courses).filter(Courses.cfu==6).all()
+        return render_template('curriculum.html', curriculum=curriculum, groups = groups, courses=courses, valid_curriculum=valid_curriculum)
     
     if request.method == 'POST':
 
@@ -122,8 +122,23 @@ def curriculum(curriculum_id):
         for course_id in request.form.getlist("course_id[]"):
             course = Courses.query.get(course_id)
             studyplan.courses.append(course)
-        othercourse1 = createOthercourse(request.form['othercourse1'], request.form['othercourse1_id'], request.form['othercourse1_name'], request.form['othercourse1_cfu'], request.form['othercourse1_ssd'] )
-        othercourse2 = createOthercourse(request.form['othercourse2'], request.form['othercourse2_id'], request.form['othercourse2_name'], request.form['othercourse2_cfu'], request.form['othercourse2_ssd'] )
+
+        if request.form['course1'] == "":
+            othercourse1 = createOthercourse(request.form['othercourse1_id'], request.form['othercourse1_name'], request.form['othercourse1_cfu'], request.form['othercourse1_ssd'] )
+            othercourse1.note=request.form['othercourse1_note']
+        else:
+            course1 = Courses.query.get(request.form['course1'])
+            othercourse1 = createOthercourse(course1.id, course1.name, course1.cfu, course1.ssd)
+
+        if request.form['course2'] == "":
+            othercourse2 = createOthercourse(request.form['othercourse2_id'], request.form['othercourse2_name'], request.form['othercourse2_cfu'], request.form['othercourse2_ssd'] )
+            othercourse2.note=request.form['othercourse2_note']
+        else:
+            course2 = Courses.query.get(request.form['course2'])
+            othercourse2 = createOthercourse(course2.id, course2.name, course2.cfu, course2.ssd)
+
+       
+
         studyplan.othercourses.append(othercourse1)
         studyplan.othercourses.append(othercourse2)
         
@@ -168,18 +183,15 @@ def createStudent(student_id, student_firstname, student_lastname):
 
     return student
 
-def createOthercourse(othercourse_from_list, othercourse_id, othercourse_name, othercourse_cfu, othercourse_ssd):
+def createOthercourse(othercourse_id, othercourse_name, othercourse_cfu, othercourse_ssd):
     # se il corso e' stato selezionato dalla lista lo si recupera altrimenti lo si crea. 
-    if othercourse_from_list != "":
-        othercourse = OtherCourses.query.get(othercourse_from_list)
+    if OtherCourses.query.get(othercourse_id) is None:
+        othercourse = OtherCourses(id=othercourse_id, name=othercourse_name, cfu=othercourse_cfu, ssd=othercourse_ssd)
     else:
-        if OtherCourses.query.get(othercourse_id) is None:
-            othercourse = OtherCourses(id=othercourse_id, name=othercourse_name, cfu=othercourse_cfu, ssd=othercourse_ssd)
-        else:
-            othercourse = OtherCourses.query.get(othercourse_id)
-            othercourse.name = othercourse_name
-            othercourse.cfu = othercourse_cfu
-            othercourse.ssd = othercourse_ssd
+        othercourse = OtherCourses.query.get(othercourse_id)
+        othercourse.name = othercourse_name
+        othercourse.cfu = othercourse_cfu
+        othercourse.ssd = othercourse_ssd
     return othercourse
 
 

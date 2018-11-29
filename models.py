@@ -64,6 +64,7 @@ class OtherCourses(Base):
     name = db.Column(db.String(200), nullable=False)               # name = Analisi Matematica
     cfu = db.Column(db.Integer, nullable=False)
     ssd = db.Column(db.String(10), nullable=False)
+    note = db.Column(db.String(2000), nullable=True)
 
     def __init__(self, id, name, cfu, ssd):
         self.id=id
